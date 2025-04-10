@@ -3,10 +3,11 @@ import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.conf import settings
+
 
 from .models import User  # your custom User model
 
-SECRET_KEY = "bigclass"
 
 @csrf_exempt
 def signin(request):
@@ -30,12 +31,13 @@ def signin(request):
             return JsonResponse({'error': 'Incorrect password'}, status=401)
 
         payload = {
+            "id": user.id,
             'username': user.username,
             'email': user.email,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }
 
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
         return JsonResponse({'token': token}, status=200)
 
