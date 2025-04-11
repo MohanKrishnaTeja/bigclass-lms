@@ -18,3 +18,14 @@ class Enrollment(models.Model):
 
     class Meta:
         unique_together = ('user', 'course')
+
+class ScheduleEvent(models.Model):
+    title = models.CharField(max_length=200)
+    time = models.TimeField()
+    date = models.DateField()
+    host = models.CharField(max_length=100)
+    zoom_link = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.date} {self.time}"

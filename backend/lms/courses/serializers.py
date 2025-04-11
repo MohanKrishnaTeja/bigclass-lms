@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Course, Enrollment
+from .models import Course, Enrollment, ScheduleEvent
+
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,3 +14,8 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         fields = ['id', 'course', 'enrolled_at']
+
+class ScheduleEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleEvent
+        fields = ['title', 'time', 'host', 'zoom_link']
