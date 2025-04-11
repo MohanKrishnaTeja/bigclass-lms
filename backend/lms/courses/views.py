@@ -4,6 +4,11 @@ from rest_framework import status, permissions
 from .models import Course, Enrollment
 from .serializers import CourseSerializer, EnrollmentSerializer
 from django.shortcuts import get_object_or_404
+from datetime import date
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import ScheduleEvent  # Make sure ScheduleEvent exists
+from .serializers import ScheduleEventSerializer  # Make sure this is defined
+
 
 from users.authentication import JWTAuthentication  # 👈 Import your custom JWT auth
 
@@ -33,4 +38,14 @@ class CourseListView(APIView):
     def get(self, request):
         courses = Course.objects.all()
         serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
+class TodayScheduleView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request):
+        today = date.today()
+        events = ScheduleEvent.objects.filter(date=today).order_by('time')
+        serializer = ScheduleEventSerializer(events, many=True)
         return Response(serializer.data)
