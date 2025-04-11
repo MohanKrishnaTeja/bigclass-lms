@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'corsheaders',
+    'rest_framework',  # Add rest_framework explicitly
     'courses',
+    'watchtime',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware must come first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,21 +54,53 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Add this FIRST (or at least before CommonMiddleware)
-    'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = False
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Your frontend dev server
-]
-
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # For testing, you can set this to True temporarily
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken', 'Authorization']
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'authorization',
+    'x-csrftoken',
 ]
+
+# Rest Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'users.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# Configure logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'users.authentication': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 ROOT_URLCONF = 'lms.urls'
 
@@ -95,7 +130,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'class',
         'USER': 'postgres',
-        'PASSWORD': 'mohankrishna',  # Replace this
+        'PASSWORD': 'admin',  # Replace this
         'HOST': 'localhost',
         'PORT': '5432',
     }
